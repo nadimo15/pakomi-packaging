@@ -1,0 +1,50 @@
+# render.yaml - Render Blueprint
+# This file defines all the services needed to run the Pakomi application.
+# Render will automatically detect this file when you connect your repository.
+services:
+  # 1. Backend Web Service (Node.js/Express)
+  - type: web
+    name: pakomi-backend
+    runtime: node
+    # Omitting 'plan' to default to the free tier, as 'plan: free' was causing errors.
+    rootDir: backend
+    buildCommand: "npm install && npm run prisma:generate && npm run prisma:deploy && npm run build"
+    startCommand: "npm start"
+    healthCheckPath: /api
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: pakomi-db      # Must match the database name below
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true   # Securely generate a random secret on Render
+      # The frontend URL is constructed from the frontend service name.
+      # If you change the service name 'pakomi-frontend', you must update this URL.
+      - key: FRONTEND_URL
+        value: https://pakomi-frontend.onrender.com
+
+  # 2. Frontend Static Site (Vite)
+  - type: web
+    name: pakomi-frontend
+    runtime: static # Special runtime for serving static content.
+    rootDir: frontend # Point to the 'frontend' directory for the source code.
+    buildCommand: "npm install && npm run build"
+    staticPublishPath: "dist" # Correct property for 'static' runtime.
+    envVars:
+      # This provides the base URL, e.g., https://pakomi-backend.onrender.com
+      # The frontend's api.ts code will append '/api' to it.
+      # If you change the service name 'pakomi-backend', you must update this URL.
+      - key: VITE_BACKEND_URL
+        value: https://pakomi-backend.onrender.com
+    routes:
+      # Rewrite all paths to index.html for a Single-Page Application
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+databases:
+  # 3. PostgreSQL Database
+  - name: pakomi-db
+    databaseName: pakomi_db
+    user: pakomi_user
+    plan: free # NOTE: Free tier databases expire after 90 days of inactivity.

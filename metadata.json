@@ -1,0 +1,5 @@
+{
+  "name": "Pakomi Packaging",
+  "description": "A web platform for designing and ordering custom e-commerce packaging. Users can specify dimensions, colors, and upload their logos for a live preview before placing an order.",
+  "requestFramePermissions": []
+}
