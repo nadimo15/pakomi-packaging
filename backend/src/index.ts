@@ -16,8 +16,29 @@ dotenv.config();
 const app: Express = express();
 const port = process.env.PORT || 3001;
 
+// --- CORS Configuration ---
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+const allowedOrigins = [
+    FRONTEND_URL,
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+    'http://localhost:8088',
+    'http://127.0.0.1:8088'
+];
+const corsOptions: cors.CorsOptions = {
+    origin(origin, callback) {
+        if (!origin) return callback(null, true); // allow same-origin or curl
+        if (allowedOrigins.some((o) => origin.startsWith(o))) return callback(null, true);
+        return callback(new Error(`Not allowed by CORS: ${origin}`));
+    },
+    credentials: true,
+    methods: ['GET','HEAD','PUT','PATCH','POST','DELETE','OPTIONS'],
+    allowedHeaders: ['Content-Type','Authorization']
+};
+
 // --- Middleware ---
-app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:5173' }));
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
