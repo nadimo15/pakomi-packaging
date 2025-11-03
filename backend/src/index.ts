@@ -3,6 +3,9 @@ import express, { Express } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import multer from 'multer';
+import pkg from '@prisma/client';
+const { PrismaClient } = pkg;
+import bcrypt from 'bcryptjs';
 
 import * as authController from './controllers/authController.js';
 import * as dataController from './controllers/dataController.js';
@@ -93,7 +96,32 @@ app.post('/api/admin/shipping/create', shippingController.createShipment);
 app.get('/api/admin/shipping/track/:orderId', shippingController.trackShipment);
 
 
-// --- Server ---
-app.listen(port, () => {
-    console.log(`[server]: Server is running at http://localhost:${port}`);
-});
+const prisma = new PrismaClient();
+async function seed() {
+    const adminRole = await prisma.role.upsert({
+        where: { name: 'Admin' },
+        update: { permissions: ['admin'] as any },
+        create: { name: 'Admin', permissions: ['admin'] as any },
+    });
+    await prisma.role.upsert({
+        where: { name: 'Customer' },
+        update: { permissions: [] as any },
+        create: { name: 'Customer', permissions: [] as any },
+    });
+    const email = 'admin@pakomi.com';
+    const passwordHash = await bcrypt.hash('123456789', 10);
+    const existing = await prisma.user.findUnique({ where: { email } });
+    if (!existing) {
+        await prisma.user.create({
+            data: { name: 'Admin', email, passwordHash, roleId: adminRole.id },
+        });
+    }
+}
+
+seed()
+  .catch(() => {})
+  .finally(() => {
+    app.listen(port, () => {
+        console.log(`[server]: Server is running at http://localhost:${port}`);
+    });
+  });
