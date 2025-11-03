@@ -3,11 +3,8 @@ version: '3.8'
 services:
   frontend:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: pakomi-frontend
-    ports:
-      - "3000:80"
+      context: .
+      dockerfile: frontend/Dockerfile
     networks:
       - pakomi-network
     restart: unless-stopped
@@ -16,9 +13,6 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: pakomi-backend
-    ports:
-      - "3001:3001"
     depends_on:
       - db
     networks:
@@ -30,7 +24,6 @@ services:
 
   db:
     image: mysql:8.0
-    container_name: pakomi-mysql-db
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
