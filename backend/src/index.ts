@@ -29,6 +29,11 @@ app.get('/api', (req: express.Request, res: express.Response) => {
     res.send('Pakomi Backend is running!');
 });
 
+// Lightweight health endpoint (no DB access)
+app.get('/health', (_req: express.Request, res: express.Response) => {
+    res.status(200).send('OK');
+});
+
 // --- Public Routes ---
 app.get('/api/data/public', dataController.getPublicData);
 app.post('/api/orders', orderController.createOrder);
