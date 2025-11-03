@@ -1,5 +1,6 @@
 import { useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
+// Use the frontend AuthContext to ensure a single provider instance across app and shared components
+import { AuthContext } from '../frontend/src/context/AuthContext';
 
 export const useAuth = () => {
     const context = useContext(AuthContext);
