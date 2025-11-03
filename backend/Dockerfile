@@ -1,11 +1,13 @@
-# Use an official Node.js runtime as a parent image
-FROM node:20-alpine AS base
+# Use Debian-based image (fixes Prisma engine OpenSSL/musl issues on Alpine)
+FROM node:20-bookworm-slim AS base
 
 # Set the working directory
 WORKDIR /usr/src/app
 
-# Install curl for healthchecks
-RUN apk add --no-cache curl
+# Install curl and openssl for healthchecks and Prisma engines
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl openssl ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy package.json and package-lock.json (if available)
 COPY package*.json ./
