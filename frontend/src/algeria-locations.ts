@@ -306,4 +306,6 @@ export const WILAYAS: Wilaya[] = [
     { "id": 760, "name": "Ouldja Boulballout" }, { "id": 761, "name": "Ramdane Djamel" }, { "id": 762, "name": "Beni Bechir" },
     { "id": 763, "name": "Sidi Mezghiche" }, { "id": 764, "name": "Emdjez Edchich" }, { "id": 765, "name": "Tamalous" },
     { "id": 766, "name": "Bin El Ouiden" }, { "id": 767, "name": "Zerdazas" }, { "id": 768, "name": "Ouled Hbaba" },
-    { "id": 769, "name": "Es Sebt" }, { "id": 770, "name": "Azzaba" }, { "id": 771, "name
+    { "id": 769, "name": "Es Sebt" }, { "id": 770, "name": "Azzaba" }
+  ]}
+]
