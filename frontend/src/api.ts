@@ -1,6 +1,17 @@
-// In a real Vite project, you would use `import.meta.env.VITE_API_URL`
-// For this environment, we'll hardcode it but check for an env variable.
-const BACKEND_URL = (import.meta as any).env?.VITE_BACKEND_URL || 'http://localhost:3001';
+// Resolve backend URL dynamically:
+// 1) Use build-time Vite env if set (VITE_BACKEND_URL)
+// 2) Else derive from current origin (protocol + hostname) with port 3001
+// 3) Fallback to localhost:3001
+const resolveBackendUrl = () => {
+    const envUrl = (import.meta as any)?.env?.VITE_BACKEND_URL;
+    if (envUrl) return envUrl as string;
+    if (typeof window !== 'undefined' && window.location) {
+        const { protocol, hostname } = window.location;
+        return `${protocol}//${hostname}:3001`;
+    }
+    return 'http://localhost:3001';
+};
+const BACKEND_URL = resolveBackendUrl();
 const API_BASE_URL = `${BACKEND_URL}/api`;
 
 import type { 
