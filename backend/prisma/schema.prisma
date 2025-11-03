@@ -1,1 +1,133 @@
-ÿταΘ¬Κ‹«>Έ¬™«…ι
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String  @id @default(cuid())
+  name         String
+  email        String  @unique
+  passwordHash String
+
+  roleId String
+  role   Role    @relation(fields: [roleId], references: [id])
+
+  orders Order[]
+}
+
+model Role {
+  id          String  @id @default(cuid())
+  name        String  @unique
+  // MySQL has no native string[]; store permissions as JSON (array of strings at runtime)
+  permissions Json
+
+  users User[]
+}
+
+model SiteSettings {
+  id   String @id
+  data Json
+}
+
+model FormConfig {
+  id   String @id
+  data Json
+}
+
+model Product {
+  id               String @id
+  name             String
+  galleryImagesB64 Json?
+  availableColors  Json?
+  displayOrder     Int
+
+  sizes ProductSize[]
+}
+
+model ProductSize {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  width   Float
+  height  Float
+  depth   Float
+  weight  Float
+  pricing Json
+}
+
+model Task {
+  id          String   @id @default(cuid())
+  text        String
+  priority    String
+  isCompleted Boolean
+  createdAt   DateTime
+}
+
+model Order {
+  id           String  @id
+  clientName   String
+  phone        String
+  email        String?
+  address      String
+  wilaya       String
+  commune      String
+  socials      Json?
+  totalPrice   Float
+  totalWeight  Float
+  status       String  @default("Pending")
+  submittedAt  DateTime @default(now())
+  shippingInfo Json?
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  lineItems    OrderLineItem[]
+  chatMessages ChatMessage[]
+  review       Review?
+}
+
+model OrderLineItem {
+  id        String @id @default(cuid())
+  orderId   String
+  order     Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productType String
+  productName String
+  width       Float
+  height      Float
+  depth       Float
+  quantity    Int
+  logoUrl     String?
+  logoProps   Json?
+  color       String?
+  description String?
+  unitPrice   Float
+  itemWeight  Float
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  text      String
+  sender    String
+  fileUrl   String?
+  fileName  String?
+  fileType  String?
+  timestamp DateTime @default(now())
+}
+
+model Review {
+  id       String @id @default(cuid())
+  orderId  String @unique
+  order    Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  rating   Int
+  comment  String?
+}
