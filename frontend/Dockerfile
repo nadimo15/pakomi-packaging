@@ -15,6 +15,8 @@ RUN npm run build
 # Stage 2: Serve the static files with Nginx
 FROM nginx:stable-alpine
 
+RUN apk add --no-cache curl
+
 COPY --from=build /usr/src/app/frontend/dist /usr/share/nginx/html
 
 # Copy the Nginx configuration file (from repo root path)
