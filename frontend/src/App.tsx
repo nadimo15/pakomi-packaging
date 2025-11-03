@@ -17,6 +17,8 @@ import { Language } from '../../types.ts';
 import { getSiteSettings } from './api.ts';
 import { AuthProvider } from './context/AuthContext.tsx';
 import { useAuth } from './hooks/useAuth.ts';
+import './theme.css';
+import { ThemeToggle } from './theme.tsx';
 
 // Helper function to get the route from the URL hash
 const getRouteFromHash = () => window.location.hash.substring(1) || '/';
@@ -201,6 +203,7 @@ function App() {
           {renderPage()}
         </main>
         <Footer language={language} />
+        <ThemeToggle />
       </div>
     </AuthProvider>
   );
